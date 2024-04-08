@@ -1,16 +1,23 @@
+/** @file semaforo.c
+ * @brief Programa que permite simular el funcionamiento de un cruce peatonal con un ATtiny4313.
+ * @author Alexander Rojas Brenes - B86869
+ * @author Kendall Saborío Picado - B87103
+ * @date 07/04/2024
+ */
+
+/*Librerías*/
 #include <avr/io.h>
 #include <util/delay.h>
+#include <avr/interrupt.h>
 
-int main(void)
+/* DECLARACIÓN DE FUNCIONES */
+// Prototipos de funciones
+void setup();
+void FSM();
+
+void main(void)
 {
-    DDRB = 0x08; // Configuracion del puerto
-
-    // Parpadear
-    while (1)
-    {
-        PORTB = 0x00; // PORTB &= ~(1 << PB3); //Esto se puede hacer tambien asi
-        _delay_ms(500);
-        PORTB = 0x08; // PORTB |=  (1 << PB3); //Esto se puede hacer tambien asi
-        _delay_ms(500);
-    }
+    setup(); // Configuración.
+    sei();   // Habilitación interrupciones.
+    FSM();   // Ejecución de la simulación.
 }

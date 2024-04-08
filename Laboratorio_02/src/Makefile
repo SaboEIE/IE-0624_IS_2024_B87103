@@ -14,4 +14,4 @@ flash:
 	avrdude -p ${MCU} -c usbasp -U flash:w:${TARGET}.hex:i -F -P usb
 
 clean:
-	rm -f *.bin *.hex
+	rm -f *.c~ *.h~ *.o *.elf *.hex *.asm
