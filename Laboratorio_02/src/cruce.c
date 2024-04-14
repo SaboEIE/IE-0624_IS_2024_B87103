@@ -26,18 +26,13 @@
 // Estado actual: variable global
 int state;
 
-//
+// Variables globales para el manejo de tiempos
 int seconds;
 int success_ctc = 0;
 
 // Estado de los botones del paso peatonal: variable global
 int btn_pushed;
 
-// Prototipos de funciones
-void init();
-void FSM();
-
-/* DECLARACIÓN DE FUNCIONES */
 // Prototipos de funciones
 void init();
 void FSM();
@@ -136,4 +131,51 @@ void init()
 
     // Se habilita la interrupción por comparación A del Timer0.
     TIMSK |= (1 << OCIE0A); 
+}
+
+/** @brief Función que contiene un FSM que simula un cruce peatonal
+ *  @details Esta función contiene la máquina de estados que permite las 
+ *  transiciones de estado en función de distintas condiciones que dependen del
+ *  estado actual. El estado por defecto es el caso en el que el botón del 
+ *  semáforo peatonal nunca es accionado, es decir, está en rojo y el vehicular
+ *  en verde. 
+*/
+void FSM(){
+    while(1){
+        switch (state){
+            // Semáforo vehicular: luz verde encendida -> 10 s.
+            // Semáforo peatonal: luz roja encendida.
+            case (GO_CAR):
+                PORTB = (1 << PB4)|(0 << PB3)|(0 << PB2)|(0 << PB1)|(1 << PB0);
+
+                if((btn_pushed == 1) && (seconds >= ENABLE_PUSH_TIME)){
+                    seconds = 0;
+                    btn_pushed = 0;
+                    state = BLINK_CAR; // Actualización de estado. 
+                }
+            break;
+
+            // Semáforo vehicular: luz amarilla parpadeando -> 3 s.
+            // Semáforo peatonal: luz ¿oja encendida.
+            case (BLINK_CAR):
+                PORTB &= ~(1 << PB0); // Apaga la luz verde. 
+
+                if((seconds >= BLINK_TIME) && (success_ctc == 30 || success_ctc == 60)){
+                    seconds = 0; 
+                    state = STOP_CAR;
+                }
+            break;
+
+            // Semáforo vehicular: luz roja encendida -> 1 s.
+            // Semáforo peatonal: luz roja encendida.
+            case (STOP_CAR):
+                PORTB = (1 << PB4)|(0 << PB3)|(1 << PB2)|(0 << PB1)|(0 << PB0);
+
+                if (seconds >= SAFE_TIME){
+                    seconds = 0;
+                    state = GO_WALKER;
+                }
+            break;
+        }
+    }
 }
