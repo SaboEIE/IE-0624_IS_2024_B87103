@@ -52,6 +52,28 @@ void FSM();
  */
 ISR(INT0_vect) { btn_pushed = 1; }
 
+/** @brief Rutina de interrupción causada por el temporizador.
+ *  @details Esta función permite controlar el tiempo del programa ya que tras 
+ *  n comparaciones exitosos, suma una unidad a la varible global de segundos. 
+ *  Lo anterior permite que la máquina de estados realice las transiciones en 
+ *  los momentos adecuados. Asimismo, hace posible los parpadeos de los estados
+ *  en los que esto es necesario.  
+*/
+ISR (TIMER0_COMPA_vect) {
+    if (state == BLINK_CAR && (success_ctc == 30|| success_ctc == 60))
+        PORTB ^= (1 << PB1);
+
+    if (state == BLINK_WALKER && (success_ctc == 30 || success_ctc == 60))
+        PORTB ^= (1 << PB3);
+
+    if (success_ctc == 60){
+        seconds++;
+        success_ctc = 0; 
+    }
+
+    success_ctc++; 
+}
+
 /** @brief Función principal.
  *  @details La función principal solamente hace el llamado de la función
  *  init() para configurar adecuadamente el ATtiny4313 y FSM() para iniciar con
@@ -99,4 +121,19 @@ void init()
 
     // Configurar la interrupción externa INT0 para que se active en el flanco de subida
     MCUCR |= (1 << ISC00) | (1 << ISC01);
+
+    // Se inicializa el valor del Timer0.
+    TCNT0 = 0;
+
+    // Valor de comparación
+    OCR0A = 255;     
+
+    // Se habilita el modo CTC 
+    TCCR0A = (1 << WGM01) | (0 << WGM00);
+
+    // Modo CTC y prescaler de 1024
+    TCCR0B =  (0 << WGM02) | (1 << CS02) | (0 << CS01) | (1 << CS00);
+
+    // Se habilita la interrupción por comparación A del Timer0.
+    TIMSK |= (1 << OCIE0A); 
 }
