@@ -1,0 +1,15 @@
+\newpage
+\section{CONCLUSIONES Y RECOMENDACIONES}
+A lo largo del desarrollo del informe se pusieron a prueba una serie de conceptos y prácticas importantes para el manejo básico del microcontrolador ATtiny4313, así como sus GPIO, \textit{timers} y el uso de máquinas de estado finito. A continuación algunas conclusiones y recomendaciones recolectadas a lo largo de trabajo realizado: 
+
+\begin{itemize}
+    \item La simulación del cruce peatonal refleja de manera coherente los estados de la Máquina de Estados Finitos (FSM), garantizando una representación coherente con lo esperado de la secuencia de luces tanto vehiculares como peatonales. 
+
+    \item La verificación del comportamiento de las señales mediante el osciloscopio confirma la correcta secuencia temporal y activación de las diferentes luces del cruce, validando así la precisión y fiabilidad del simulador, respecto al diagrama de tiempos dado en el enunciado. 
+
+    \item Al trabajar con interrupciones y temporizadores, es de suma importancia comprender con profundidad la forma en la que estos operan en general y para el caso específico del microcontrolador con el que se esté trabajando, ya que el método de programación que debe utilizarse no es tan intuitivo como al momento de hacer uso de retrasos.
+
+    \item Es muy importante no subestimar la información contenida en las hojas del fabricante. En estas está contenida toda la información necesaria para realizar un diseño seguro, eficiente y estable. 
+
+    \item El presente diseño podría ser extendido y mejorado, agregando la evaluación de casos como la acción que se debe tomar si ambos botones del paso peatonal se presionan a la vez o el caso en el que el cruce sea bidireccional.  
+\end{itemize} 

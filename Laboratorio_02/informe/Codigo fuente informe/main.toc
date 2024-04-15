@@ -1,0 +1,24 @@
+\babel@toc {spanish}{}\relax 
+\babel@toc {spanish}{}\relax 
+\contentsline {section}{\numberline {1}INTRODUCCIÓN}{2}{section.1}%
+\contentsline {section}{\numberline {2}NOTA TEÓRICA}{3}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Microcontrolador ATtiny4313}{3}{subsection.2.1}%
+\contentsline {subsubsection}{\numberline {2.1.1}Registros de importancia}{5}{subsubsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.2}Resistencia de \textit {pull-down}}{8}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Circuito para lidiar con el \textit {switch bounce}}{9}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Diseño del circuito simulador de un paso peatonal}{11}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Lista de componentes y precios}{12}{subsection.2.5}%
+\contentsline {subsection}{\numberline {2.6}Máquinas de estado finitas (FSM)}{12}{subsection.2.6}%
+\contentsline {section}{\numberline {3}DESARROLLO Y ANÁLISIS DE RESULTADOS}{14}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Desarrollo de la solución}{14}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}Función \texttt {init()}}{14}{subsubsection.3.1.1}%
+\contentsline {subsubsection}{\numberline {3.1.2}Rutina de interrupción externa}{14}{subsubsection.3.1.2}%
+\contentsline {subsubsection}{\numberline {3.1.3}Rutina de interrupción de temporizador}{14}{subsubsection.3.1.3}%
+\contentsline {subsubsection}{\numberline {3.1.4}Función \texttt {FSM()}}{14}{subsubsection.3.1.4}%
+\contentsline {subsubsection}{\numberline {3.1.5}Función \texttt {main()}}{16}{subsubsection.3.1.5}%
+\contentsline {subsubsection}{\numberline {3.1.6}Construcción del circuito utilizado}{16}{subsubsection.3.1.6}%
+\contentsline {subsection}{\numberline {3.2}Análisis de los resultados}{17}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}Funcionamiento del simulador del cruce peatonal según su estado}{17}{subsubsection.3.2.1}%
+\contentsline {section}{\numberline {4}CONCLUSIONES Y RECOMENDACIONES}{23}{section.4}%
+\contentsline {section}{\numberline {5}Anexos}{25}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Hoja del fabricante del ATtiny2313 Atmel: información general}{25}{subsection.5.1}%

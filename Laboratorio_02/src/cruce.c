@@ -90,6 +90,8 @@ int main(void)
  * sei(). Además, se configuran los pines del puerto B que se utilizarán, tanto
  * su estado como su modo. Lo siguiente es la configuración de la interrupción
  * externa INT0, la cual permite controla el cruce a través de un pulsador.
+ * Finalmente se configura el temporizador 0 utilizando el modo de
+ * lear Timer on Compare Match.
  */
 void init()
 {
@@ -176,6 +178,45 @@ void FSM(){
                     state = GO_WALKER;
                 }
             break;
+                    // Semáforo vehicular: luz roja encendida.
+            // Semáforo peatonal: luz verde encendida -> 10 s.
+            case (GO_WALKER):
+                PORTB = (0 << PB4) | (1 << PB3) | (1 << PB2) | (0 << PB1) | (0 << PB0);
+
+                if (seconds >= GO_WALKER_TIME)
+                {
+                    seconds = 0;
+                    state = BLINK_WALKER;
+                }
+                break;
+
+            // Semáforo vehicular: luz roja encendida.
+            // Semáforo peatonal: luz verde parpadeando -> 3 s.
+            case (BLINK_WALKER):
+
+                if ((seconds >= BLINK_TIME) && (success_ctc == 30 || success_ctc == 60))
+                {
+                    seconds = 0;
+                    state = STOP_WALKER;
+                }
+                break;
+
+            // Semáforo vehicular: luz roja encendida -> 1 s.
+            // Semáforo peatonal: luz roja encendida.
+            case (STOP_WALKER):
+                PORTB = (1 << PB4) | (0 << PB3) | (1 << PB2) | (0 << PB1) | (0 << PB0);
+
+                if (seconds >= SAFE_TIME)
+                {
+                    seconds = 0;
+                    state = GO_CAR;
+                }
+                break;
+
+            // Semáforo vehicular siempre en verde.
+            default:
+                state = GO_CAR;
+                break;
         }
     }
 }
