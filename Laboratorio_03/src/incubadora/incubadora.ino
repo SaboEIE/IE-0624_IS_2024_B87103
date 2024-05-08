@@ -1,3 +1,10 @@
+/** @file incubadora.ino
+ * @brief Programa que permite simular el funcionamiento de una incubadora utilizando un Arduino UNO.
+ * @author Alexander Rojas Brenes - B86869
+ * @author Kendall Saborío Picado - B87103
+ * @date 08/04/2024
+ */
+
 // Librería para el control del LCD
 #include <PCD8544.h>
 
@@ -20,6 +27,9 @@ const int red_led = 2;
 // Pin de conexión para el dispositivo LCD
 const int LCD_PIN = A4;
 
+// Pin de conexión para la comunicación serial
+const int Serial_PIN = A5;
+
 // Objeto para controlar el LCD
 static PCD8544 lcd;
 
@@ -32,6 +42,15 @@ double consKp = 255, consKi = 0.0, consKd = 1;
 // Variable para el valor convertido de la salida del PID
 float output_coverted;
 
+/**
+ * @brief Configura los pines y los dispositivos necesarios al inicializar el 
+ * programa.
+ * @details Esta función se encarga de inicializar todo lo necesario para que 
+ * el proyecto funcione correctamente.
+ * Configura los pines de salida para los LEDs y de entrada para los 
+ * dispositivos LCD y Serial, además inicia la comunicación con el LCD y 
+ * configura el modo de operación del controlador PID.
+ */
 void setup() {
   // Pin de salida para el LED azul
   pinMode(blue_led, OUTPUT);
@@ -44,6 +63,9 @@ void setup() {
 
   // Pin de entrada para el dispositivo LCD
   pinMode(LCD_PIN, INPUT);
+
+  // Pin de entrada para la comunicación serial
+  pinMode(Serial_PIN, INPUT);
 
   // Inicia la comunicación con el LCD con una resolución predeterminada de 84x48 píxeles
   lcd.begin();
@@ -135,6 +157,19 @@ float simPlanta(float Q){
 
   return T;
 }
+
+/** @brief Función que imprime valores en el puerto serial. 
+ *  @details Esta función agrupa los valores de la temperatura de operación, la 
+ *  señal de control y la señal de salida de la planta, de forma que estos 
+ *  puedan ser captados y utilizados en futuro procesamiento. 
+ *  @param op_temp valor de tipo double que representa el setpoint. 
+ *  @param PID valor de tipo double que representa la señal de control. 
+ *  @param out_temp valor de tipo double que representa la señal de salida. 
+*/
+void serial_com(double op_temp, double PID, double out_temp){
+  Serial.println(String(op_temp) + String(", ") + String(PID) + String(", ") + String(out_temp));
+}
+
 /**
  * @brief Función principal del programa que se ejecuta repetidamente.
  * @details Esta función realiza las siguientes operaciones en un ciclo continuo:
@@ -146,6 +181,7 @@ float simPlanta(float Q){
  * 6. Simula el comportamiento térmico de la planta y obtiene la temperatura de salida.
  * 7. Controla los LEDs en función de la temperatura de salida.
  * 8. Actualiza la pantalla LCD si el pin de control está en estado alto.
+ * 9. Inicia o detiene la comunicación serial si el pin de control está en estado alto.
  */
 void loop() {
   // Lee el valor del potenciómetro
@@ -177,5 +213,15 @@ void loop() {
   else {
     // Limpiar la pantalla LCD si el pin de control está en estado bajo
     lcd.clear();
+  }
+
+  // Inicia o detiene la comunicación serial si el pin de control está en estado alto
+  if (digitalRead(Serial_PIN) == HIGH) {
+    Serial.begin(9600);
+    // Envia los datos a través del puerto serial
+    serial_com(potmappedValue, Output, Input);
+  }
+  else {
+    Serial.end();
   }
 }
