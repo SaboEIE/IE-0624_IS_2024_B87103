@@ -39,6 +39,9 @@ double Setpoint, Input, Output;
 // Constantes para los coeficientes del PID
 double consKp = 255, consKi = 0.0, consKd = 1;
 
+// Objeto controlador PID
+PID myPID(&Input, &Output, &Setpoint, consKp, consKi, consKd, DIRECT);
+
 // Variable para el valor convertido de la salida del PID
 float output_coverted;
 
