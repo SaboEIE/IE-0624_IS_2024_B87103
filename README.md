@@ -12,7 +12,7 @@ Este laboratorio corresponde a un programa que permite simular el funcionamiento
 una incubadora de huevos automática basada en Arduino UNO. 
 
 ## Procedimiento de ejecución
-1. Ingresar en el directorio `src` y abrir una terminal en este. 
+1. Ingresar en el directorio `./Laboratorio_03/src` y abrir una terminal en este. 
 2. Ejecutar el comando `./virt_port.sh` para habilitar los puertos virtuales que permiten la comunicación entre Arduino y la computadora.
 3. Abrir el archivo `./incubadora/incubadora.ino` y generar el binario necesario para la ejecución.
 4. Abrir el `incubadora.simu` y cargar el firmware (el binario .hex generado).
