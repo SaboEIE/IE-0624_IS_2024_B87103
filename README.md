@@ -5,7 +5,7 @@
 - Alexander Rojas Brenes (B86869)
 - Kendall Saborio Picado (B87103)
 #### I Ciclo 2024
-##### Laboratorio 03: Arduino: PID, GPIO, ADC y comunicaciones
+##### Laboratorio 04: STM32: GPIO, ADC, timer, comunicaciones, Iot
 ---
 ## Descripción
 Este laboratorio corresponde a un programa que permite simular el funcionamiento de 
