@@ -30,6 +30,8 @@
 void lcd_spi_init(void);
 void lcd_show_frame(void);
 void lcd_draw_pixel(int x, int y, uint16_t color);
+int print_decimal(int num); 
+int print_hex(int v); 
 
 /* Color definitions */
 #define	LCD_BLACK   0x0000

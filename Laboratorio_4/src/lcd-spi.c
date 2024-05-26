@@ -32,8 +32,8 @@
 
 
 /* forward prototypes for some helper functions */
-static int print_decimal(int v);
-static int print_hex(int v);
+//static int print_decimal(int num);
+//static int print_hex(int v);
 
 /* Simple double buffering, one frame is displayed, the
  * other being built.
@@ -194,7 +194,7 @@ initialize_display(const struct tft_command cmds[])
 {
 	int i = 0;
 	int arg_offset = 0;
-	int j;
+	//int j;
 
 	/* Initially arg offset is zero, so each time we 'consume'
 	 * a few bytes in the args array the offset is moved and
@@ -387,7 +387,7 @@ print_decimal(int num)
  *
  * Very simple routine for printing out hex constants.
  */
-static int print_hex(int v)
+int print_hex(int v)
 {
 	int		ndx = 0;
 	char	buf[10];
