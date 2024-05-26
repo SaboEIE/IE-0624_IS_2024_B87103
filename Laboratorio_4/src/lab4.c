@@ -42,6 +42,77 @@
 #define GYR_CTRL_REG4       0x23    // Dirección del registro de control 4
 #define GYR_CTRL_REG4_FS_SHIFT 4    // Desplazamiento de bits para la configuración de la escala completa
 
+// Definiciones de constantes para los registros de salida del giroscopio
+#define GYR_OUT_X_L       0x28    // Dirección del registro de salida del eje X (bajo)
+#define GYR_OUT_X_H       0x29    // Dirección del registro de salida del eje X (alto)
+#define GYR_OUT_Y_L       0x2A    // Dirección del registro de salida del eje Y (bajo)
+#define GYR_OUT_Y_H       0x2B    // Dirección del registro de salida del eje Y (alto)
+#define GYR_OUT_Z_L       0x2C    // Dirección del registro de salida del eje Z (bajo)
+#define GYR_OUT_Z_H       0x2D    // Dirección del registro de salida del eje Z (alto)
+
+// Sensibilidad del giroscopio L3GD20 a 250 grados por segundo
+#define L3GD20_SENSITIVITY_250DPS  (0.00875F) // Sensibilidad del giroscopio a 250 dps 
+
+/**
+ * @struct Gyro
+ * @brief Estructura para almacenar los datos del giroscopio.
+ */
+typedef struct Gyro {
+  int16_t x; /**< Valor del eje X del giroscopio */
+  int16_t y; /**< Valor del eje Y del giroscopio */
+  int16_t z; /**< Valor del eje Z del giroscopio */
+  int16_t temp; /**< Valor de la temperatura del giroscopio */
+} gyro;
+
+int main(void) {
+    gyro lectura;        // Estructura para almacenar los datos del giroscopio
+    gpio_set(GPIOC, GPIO1);     // Establecer el pin GPIOC1 
+
+    return 0;  // Retorna 0 (aunque en realidad nunca llegará a esta línea ya que el bucle anterior es infinito).
+}
+
+//------------------------ Funciones de configuración -----------------------//
+/**
+ * @brief Configura los pines GPIO necesarios.
+ * 
+ * Esta función habilita los relojes para los puertos GPIOA y GPIOG, y configura:
+ * - GPIOA0 como entrada.
+ * - GPIOG13 y GPIOG14 como salidas.
+ */
+static void gpio_setup(void)
+{
+    rcc_periph_clock_enable(RCC_GPIOG);  // Habilitar el reloj para el puerto GPIOG
+    rcc_periph_clock_enable(RCC_GPIOA);  // Habilitar el reloj para el puerto GPIOA
+
+    // Configurar GPIOA0 como entrada
+    gpio_mode_setup(GPIOA, GPIO_MODE_INPUT, GPIO_PUPD_NONE, GPIO0);
+    // Configurar GPIOG13 como salida
+    gpio_mode_setup(GPIOG, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO13);
+    // Configurar GPIOG14 como salida
+    gpio_mode_setup(GPIOG, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO14);
+}
+
+/**
+ * @brief Configura el ADC (Convertidor Analógico-Digital).
+ * 
+ * Esta función configura el ADC para utilizar el canal GPIO3 como entrada analógica.
+ * Se apaga el ADC, se desactiva el modo de escaneo, se establece el tiempo de muestreo en todos los canales,
+ * y luego se enciende el ADC.
+ */
+static void adc_setup(void)
+{
+    // Configurar GPIOA3 como entrada analógica 
+    gpio_mode_setup(GPIOA, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, GPIO3);
+    // Apagar el ADC1
+    adc_power_off(ADC1);
+    // Desactivar el modo de escaneo del ADC1
+    adc_disable_scan_mode(ADC1);
+    // Establecer el tiempo de muestreo en todos los canales del ADC1 a 3 ciclos
+    adc_set_sample_time_on_all_channels(ADC1, ADC_SMPR_SMP_3CYC);
+    // Encender el ADC1
+    adc_power_on(ADC1);
+}
+
 /**
  * @brief Configura el bus SPI (Interfaz Periférica Serial).
  * 
