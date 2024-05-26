@@ -66,8 +66,11 @@ typedef struct Gyro {
 
 int main(void) {
     gyro lectura;        // Estructura para almacenar los datos del giroscopio
-    gpio_set(GPIOC, GPIO1);     // Establecer el pin GPIOC1 
-
+    // Bucle principal
+    while (1) {
+        lectura = read_xyz_temp();
+        gpio_set(GPIOC, GPIO1);     // Establecer el pin GPIOC1 
+    }
     return 0;  // Retorna 0 (aunque en realidad nunca llegará a esta línea ya que el bucle anterior es infinito).
 }
 
@@ -178,4 +181,34 @@ static void usart_setup(void)
     usart_set_parity(USART1, USART_PARITY_NONE);  // Configurar la paridad como ninguna
     usart_set_flow_control(USART1, USART_FLOWCONTROL_NONE); // Configurar el control de flujo como ninguno
     usart_enable(USART1);                         // Habilita USART1
+}
+
+/**
+ * @brief Lee los valores de los ejes X, Y, Z y la temperatura del giroscopio.
+ * 
+ * Esta función lee los valores de los ejes X, Y, Z y la temperatura del giroscopio 
+ * mediante la comunicación SPI con el dispositivo.
+ * 
+ * @return Una estructura que contiene los valores de los ejes X, Y, Z y la temperatura leídos del giroscopio.
+ */
+gyro read_xyz_temp(void) {
+    // Estructura para almacenar los valores de los ejes X, Y, Z y la temperatura
+    gyro lectura;
+
+    // Leer WHO_AM_I (registro de identificación) con el bit R/W en 1 (lectura)
+    read_reg(GYR_WHO_AM_I | 0x80);
+
+    // Leer STATUS_REG (registro de estado) con el bit R/W en 1 (lectura)            
+    read_reg(GYR_STATUS_REG | GYR_RNW);              
+
+    // Leer y calcular el valor del eje correspondiente, multiplicando por la sensibilidad correspondiente
+    lectura.x = read_axis(GYR_OUT_X_L | GYR_RNW, GYR_OUT_X_H | GYR_RNW) * L3GD20_SENSITIVITY_250DPS;
+    lectura.y = read_axis(GYR_OUT_Y_L | GYR_RNW, GYR_OUT_Y_H | GYR_RNW) * L3GD20_SENSITIVITY_250DPS;
+    lectura.z = read_axis(GYR_OUT_Z_L | GYR_RNW, GYR_OUT_Z_H | GYR_RNW) * L3GD20_SENSITIVITY_250DPS;
+
+    // Leer el valor de la temperatura
+    lectura.temp = read_reg(GYR_OUT_TEMP | GYR_RNW);
+
+    // Retornar la estructura con los valores leídos de los ejes X, Y, Z y la temperatura
+    return lectura; 
 }
