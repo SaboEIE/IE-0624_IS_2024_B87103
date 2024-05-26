@@ -65,7 +65,10 @@ typedef struct Gyro {
 } gyro;
 
 int main(void) {
-    gyro lectura;        // Estructura para almacenar los datos del giroscopio
+    gyro lectura; // Estructura para almacenar los datos del giroscopio
+    
+    init_system(); // Inicializar el sistema
+    
     // Bucle principal
     while (1) {
         lectura = read_xyz_temp();
@@ -181,6 +184,72 @@ static void usart_setup(void)
     usart_set_parity(USART1, USART_PARITY_NONE);  // Configurar la paridad como ninguna
     usart_set_flow_control(USART1, USART_FLOWCONTROL_NONE); // Configurar el control de flujo como ninguno
     usart_enable(USART1);                         // Habilita USART1
+}
+
+//------------------------------INICIALIZACIÓN GENERAL-----------------------//
+/**
+ * @brief Inicializa el sistema.
+ * 
+ * Esta función inicializa todos los periféricos y configuraciones necesarios para el sistema.
+ * Configura la consola para la comunicación serie con una velocidad de baudios de 115200.
+ * Configura el reloj del sistema.
+ * Habilita los relojes para USART1 y ADC1.
+ * Configura los pines GPIO necesarios.
+ * Inicializa el ADC.
+ * Inicializa la memoria SDRAM.
+ * Configura la USART1 para la comunicación serie.
+ * Configura el bus SPI.
+ * Inicializa la pantalla LCD mediante SPI.
+ * Inicializa el sistema gráfico.
+ */
+void init_system(void) {
+    console_setup(115200); // Configurar la consola para la comunicación serie con una velocidad de baudios de 115200
+    clock_setup(); // Configurar el reloj del sistema
+    rcc_periph_clock_enable(RCC_USART1); // Habilitar el reloj para USART1
+    rcc_periph_clock_enable(RCC_ADC1); // Habilitar el reloj para ADC1
+    gpio_setup(); // Configurar los pines GPIO necesarios
+    adc_setup(); // Inicializar el ADC
+    sdram_init(); // Inicializar la memoria SDRAM
+    usart_setup(); // Configurar USART1 para la comunicación serie
+    spi_setup(); // Configurar el bus SPI
+    lcd_spi_init(); // Inicializar la pantalla LCD mediante SPI
+    gfx_init(lcd_draw_pixel, 240, 320); // Inicializar el sistema gráfico
+}
+
+//------------------------------------ SPI ----------------------------------//
+/**
+ * @brief Escribe un valor en un registro del dispositivo mediante SPI.
+ * 
+ * Esta función envía una secuencia de datos SPI para escribir un valor en un registro específico del dispositivo.
+ * 
+ * @param reg El registro al que se va a escribir el valor.
+ * @param val El valor que se va a escribir en el registro.
+ */
+void write_reg(uint16_t reg, uint16_t val) {
+    gpio_clear(GPIOC, GPIO1); // Bajar CS (Chip Select) para comenzar transacción
+    spi_send(SPI5, reg);      // Enviar registro al giroscopio
+    spi_read(SPI5);           // Leer respuesta del giroscopio
+    spi_send(SPI5, val);      // Enviar valor al giroscopio
+    spi_read(SPI5);           // Leer respuesta del giroscopio
+    gpio_set(GPIOC, GPIO1);   // Subir CS para finalizar transacción
+}
+
+/**
+ * @brief Lee un registro del dispositivo mediante SPI.
+ * 
+ * Esta función envía una secuencia de datos SPI para leer un registro específico del dispositivo.
+ * 
+ * @param command El comando para leer el registro.
+ * @return El valor leído del registro.
+ */
+uint8_t read_reg(uint8_t command) {
+    gpio_clear(GPIOC, GPIO1);          // Desactiva el pin GPIO1 de GPIOC (probablemente CS o Chip Select)
+    spi_send(SPI5, command);           // Envia el comando por SPI5
+    spi_read(SPI5);                    // Lee y descarta una respuesta desde SPI5
+    spi_send(SPI5, 0);                 // Envía un dato de relleno (0) para iniciar la lectura del registro
+    uint8_t result = spi_read(SPI5);   // Lee el resultado desde SPI5
+    gpio_set(GPIOC, GPIO1);            // Activa el pin GPIO1 de GPIOC (termina la comunicación con el dispositivo)
+    return result;                     // Devuelve el resultado leído
 }
 
 /**
