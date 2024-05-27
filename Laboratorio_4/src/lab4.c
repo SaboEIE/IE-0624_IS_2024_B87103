@@ -69,7 +69,7 @@ static void gpio_setup(void);
 static void adc_setup(void);  
 static void spi_setup(void); 
 static void usart_setup(void); 
-void initialize_system(void); 
+void init_system(void); 
 void write_reg(uint16_t reg, uint16_t val); 
 uint8_t read_reg(uint8_t command); 
 int16_t read_axis(uint8_t lsb_command, uint8_t msb_command);
@@ -78,15 +78,81 @@ static uint16_t read_adc_naiive(uint8_t channel);
 void led_control(float bat_volt, bool defo);
 void display_data(gyro lectura, float bat_volt, bool trans);
 
+
+/**
+ * @brief Función principal del programa.
+ * 
+ * Esta función inicializa el sistema y entra en un bucle infinito donde:
+ * - Lee los valores de los ejes X, Y, Z y la temperatura del giroscopio.
+ * - Lee el valor del voltaje de la batería a través del ADC.
+ * - Muestra los datos leídos en una pantalla.
+ * - Controla un LED basado en el voltaje de la batería.
+ * - Si la bandera de transmisión está activa, envía los datos del giroscopio y el voltaje de la batería vía USART.
+ * - Cambia el estado de la bandera de transmisión cuando se presiona un botón.
+ * 
+ * @return Retorna 0 al finalizar (este punto nunca se alcanza en el bucle infinito).
+ */
 int main(void) {
     gyro lectura; // Estructura para almacenar los datos del giroscopio
-    
+    float bat_volt;      // Variable para almacenar el voltaje de la batería
+    uint16_t input_adc0; // Variable para almacenar la lectura del ADC
+    bool trans = false;  // Bandera para indicar si se debe transmitir datos
+    bool defo = false; // Bandera para indicar si existe una deformación
     init_system(); // Inicializar el sistema
     
     // Bucle principal
     while (1) {
         lectura = read_xyz_temp();
-        gpio_set(GPIOC, GPIO1);     // Establecer el pin GPIOC1 
+        gpio_set(GPIOC, GPIO1);     // Establecer el pin GPIOC1
+        input_adc0 = read_adc_naiive(3);  // Leer el valor del ADC del canal 3
+        bat_volt = (input_adc0 * 9.0f) / 4095.0f;  // Calcular el voltaje de la batería
+
+        display_data(lectura, bat_volt, trans);  // Mostrar los datos en la pantalla
+
+        // Conversión de velocidad angular a grados de las lecturas
+        float xy_angle = atan (lectura.x / lectura.y) * 180 / PI; 
+        float z_angle = acos(lectura.z / (sqrt(pow(lectura.x, 2) + pow(lectura.y, 2) + pow(lectura.z, 2)))) * 180 / PI;  
+
+        
+        if (fabs(xy_angle) >= 5 || fabs(z_angle-90) >= 5) defo = true; 
+        else defo = false;
+
+        char AXIS_X[10];
+        char AXIS_Y[10];
+        char AXIS_Z[10];
+        char TEMP[10];
+        char BAT[10];
+        char DEFO[10];
+
+        // Si la bandera de transmisión está activa
+        if (trans){
+            // Convertir los datos del giroscopio y la batería a cadenas
+            sprintf(AXIS_X, "%d", lectura.x);
+            sprintf(AXIS_Y, "%d", lectura.y);
+            sprintf(AXIS_Z, "%d", lectura.z);
+            sprintf(TEMP, "%d", lectura.temp);
+            sprintf(BAT, "%.2f", bat_volt);
+            sprintf(DEFO, "%d", defo);
+
+            // Crear el mensaje de datos a enviar
+            char msj[80] = "";
+            sprintf(msj, "%s,%s,%s,%s,%s,%s\n", AXIS_X, AXIS_Y, AXIS_Z, TEMP, BAT, DEFO); // Esto para separar valores con comas
+            
+            // Enviar los datos a través de USART1
+            for (int j = 0; msj[j] != '\0'; j++)
+            {
+                usart_send_blocking(USART1, msj[j]); // Enviar datos
+            }
+        }
+
+        led_control(bat_volt, defo);  // Controlar el LED basado en el voltaje de la batería
+
+        // Cambiar el estado de la bandera de transmisión si el botón está presionado
+        if (gpio_get(GPIOA, GPIO0)) {  
+            trans = !trans;
+        }
+
+        msleep(100); // Esperar 100 milisegundos, evita saturar las lecturas. 
     }
     return 0;  // Retorna 0 (aunque en realidad nunca llegará a esta línea ya que el bucle anterior es infinito).
 }
