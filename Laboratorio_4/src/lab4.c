@@ -365,3 +365,32 @@ void display_data(gyro lectura, float bat_volt, bool trans) {
     sprintf(display_str, "Eje X: %d", lectura.x);
     gfx_setCursor(20, 110);
     gfx_puts(display_str);
+
+    // Mostrar el valor del eje Y en la pantalla LCD en color verde
+    gfx_setTextColor(LCD_GREEN, LCD_WHITE);
+    sprintf(display_str, "Eje Y: %d", lectura.y);
+    gfx_setCursor(20, 150);
+    gfx_puts(display_str);
+
+    // Mostrar el valor del eje Z en la pantalla LCD en color azul
+    gfx_setTextColor(LCD_BLUE, LCD_WHITE);
+    sprintf(display_str, "Eje Z: %d", lectura.z);
+    gfx_setCursor(20, 190);
+    gfx_puts(display_str);
+
+    // Mostrar el valor de la temperatura en la pantalla LCD en color magenta
+    gfx_setTextColor(LCD_MAGENTA, LCD_WHITE);
+    sprintf(display_str, "Temp: %d C", lectura.temp);
+    gfx_setCursor(20, 230);
+    gfx_puts(display_str);
+
+    // Mostrar el estado de transmisión en la pantalla LCD
+    gfx_setTextColor(LCD_BLACK, LCD_WHITE);
+    sprintf(display_str, "Trans: ");
+    gfx_setCursor(20, 270);
+    gfx_puts(display_str);
+    gfx_puts(trans ? "Si" : "No");
+    
+    // Actualizar la pantalla LCD mostrando el nuevo contenido
+    lcd_show_frame();
+}
