@@ -63,6 +63,13 @@ typedef struct Gyro {
   int16_t z; /**< Valor del eje Z del giroscopio */
   int16_t temp; /**< Valor de la temperatura del giroscopio */
 } gyro;
+//------------------------- Prototipos de funciones -------------------------//
+void write_reg(uint16_t reg, uint16_t val); 
+void led_control(float bat_volt, bool defo);
+uint8_t read_reg(uint8_t command);
+void display_data(gyro lectura, float bat_volt, bool trans);
+gyro read_xyz_temp(void);
+void init_system(void); 
 
 int main(void) {
     gyro lectura; // Estructura para almacenar los datos del giroscopio
@@ -251,7 +258,24 @@ uint8_t read_reg(uint8_t command) {
     gpio_set(GPIOC, GPIO1);            // Activa el pin GPIO1 de GPIOC (termina la comunicación con el dispositivo)
     return result;                     // Devuelve el resultado leído
 }
-
+/**
+ * @brief Lee el valor de un eje combinando los bytes menos significativo y más significativo.
+ *
+ * Esta función se comunica con un dispositivo SPI para leer dos bytes de datos que representan
+ * el valor de un eje. El primer byte leído corresponde al byte menos significativo (LSB) y el 
+ * segundo byte leído corresponde al byte más significativo (MSB). Los dos bytes se combinan 
+ * para formar un valor de 16 bits.
+ *
+ * @param lsb_command Comando para leer el byte menos significativo del eje.
+ * @param msb_command Comando para leer el byte más significativo del eje.
+ * @return El valor combinado de 16 bits del eje.
+ */
+int16_t read_axis(uint8_t lsb_command, uint8_t msb_command) {
+    int16_t result;
+    result = spi_communication(lsb_command);                // Lee el byte menos significativo
+    result |= spi_communication(msb_command) << 8;          // Lee el byte más significativo y lo combina con el LSB
+    return result;                                          // Devuelve el valor combinado
+}
 /**
  * @brief Lee los valores de los ejes X, Y, Z y la temperatura del giroscopio.
  * 
@@ -281,3 +305,63 @@ gyro read_xyz_temp(void) {
     // Retornar la estructura con los valores leídos de los ejes X, Y, Z y la temperatura
     return lectura; 
 }
+
+/**
+ * @brief Controla los LEDs en función del voltaje de la batería y la lectura de los ejes.
+ * 
+ * Esta función controla el estado un LED en función del voltaje de la batería.
+ * Si el voltaje de la batería es inferior a 7.5V, el LED se encenderá intermitentemente (cambiando su estado).
+ * En caso contrario, el LED se apagará.
+ * 
+ * Tambien controla el estado un LED en función de las lecturas de los ejes.
+ * Si alguno de los ejes tiene una deformación mayor a 5 grados, el led se encenderá 
+ * intermitentemente (cambiando su estado).
+ * 
+ * @param bat_volt El voltaje de la batería.
+ * @param defo Boleano que indica si hay deformación o no.
+ */
+void led_control(float bat_volt, bool defo) {
+    if (defo) gpio_toggle(GPIOG, GPIO13); // Si ocurrió una deformación, hace parpadear el LED de alerta.
+    else gpio_clear(GPIOG, GPIO13); // Si no, apaga el LED de alerta.
+
+
+    // Si el voltaje de la batería es inferior a 7.5V, el LED se encenderá intermitentemente (cambiando su estado)
+    if (bat_volt < 7.5) gpio_toggle(GPIOG, GPIO14); // Cambiar el estado del LED
+    else gpio_clear(GPIOG, GPIO14); // Apagar el LED
+}
+
+
+//------------------------ ENVIO DE DATOS A PANTALLA ------------------------//
+/**
+ * @brief Muestra los datos en la pantalla LCD.
+ * 
+ * Esta función muestra los datos proporcionados en la pantalla LCD.
+ * 
+ * @param lectura Estructura que contiene los valores de los ejes X, Y, Z y la temperatura.
+ * @param bat_volt El voltaje de la batería.
+ * @param trans Un indicador booleano que indica si se está en modo de transmisión.
+ */
+void display_data(gyro lectura, float bat_volt, bool trans) {
+    char display_str[50]; // Cadena de caracteres para formatear los datos a mostrar
+    
+    // Llenar la pantalla LCD con color blanco
+    gfx_fillScreen(LCD_WHITE);
+    // Establecer el tamaño del texto en 2
+    gfx_setTextSize(2);
+
+    // Mostrar el voltaje de la batería en la pantalla LCD
+    gfx_setTextColor(LCD_BLACK, LCD_WHITE);
+    sprintf(display_str, "Pila: %.2f V", bat_volt);
+    gfx_setCursor(20, 30);
+    gfx_puts(display_str);
+
+    // Mostrar la etiqueta "Pendientes" en la pantalla LCD
+    gfx_setTextColor(LCD_BLACK, LCD_WHITE);
+    gfx_setCursor(20, 70);
+    gfx_puts("Pendientes:");		
+
+    // Mostrar el valor del eje X en la pantalla LCD en color rojo
+    gfx_setTextColor(LCD_RED, LCD_WHITE);
+    sprintf(display_str, "Eje X: %d", lectura.x);
+    gfx_setCursor(20, 110);
+    gfx_puts(display_str);
