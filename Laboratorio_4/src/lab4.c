@@ -63,13 +63,20 @@ typedef struct Gyro {
   int16_t z; /**< Valor del eje Z del giroscopio */
   int16_t temp; /**< Valor de la temperatura del giroscopio */
 } gyro;
+
 //------------------------- Prototipos de funciones -------------------------//
+static void gpio_setup(void);
+static void adc_setup(void);  
+static void spi_setup(void); 
+static void usart_setup(void); 
+void initialize_system(void); 
 void write_reg(uint16_t reg, uint16_t val); 
+uint8_t read_reg(uint8_t command); 
+int16_t read_axis(uint8_t lsb_command, uint8_t msb_command);
+gyro read_xyz_temp(void); 
+static uint16_t read_adc_naiive(uint8_t channel);
 void led_control(float bat_volt, bool defo);
-uint8_t read_reg(uint8_t command);
 void display_data(gyro lectura, float bat_volt, bool trans);
-gyro read_xyz_temp(void);
-void init_system(void); 
 
 int main(void) {
     gyro lectura; // Estructura para almacenar los datos del giroscopio
@@ -304,6 +311,26 @@ gyro read_xyz_temp(void) {
 
     // Retornar la estructura con los valores leídos de los ejes X, Y, Z y la temperatura
     return lectura; 
+}
+
+//------------------------- BATERIA-LED1-LED2 -------------------------------//
+/**
+ * @brief Lee el valor del ADC (Convertidor Analógico-Digital) de forma ingenua.
+ * 
+ * Esta función realiza una lectura del valor analógico del ADC mediante una secuencia de operaciones básicas.
+ * 
+ * @param channel El número de canal del ADC del que se leerá el valor.
+ * @return El valor digital leído del ADC.
+ */
+static uint16_t read_adc_naiive(uint8_t channel)
+{
+    uint8_t channel_array[16];                        // Arreglo para almacenar el número de canal
+    channel_array[0] = channel;                       // Asignar el número de canal al primer elemento del arreglo
+    adc_set_regular_sequence(ADC1, 1, channel_array); // Configura la secuencia de conversión regular del ADC
+    adc_start_conversion_regular(ADC1);               // Iniciar la conversión regular del ADC
+    while (!adc_eoc(ADC1));                           // Esperar hasta que se complete la conversión
+    uint16_t reg16 = adc_read_regular(ADC1);          // Leer el valor digital del ADC
+    return reg16;                                     // Retornar el valor digital leído del ADC
 }
 
 /**
