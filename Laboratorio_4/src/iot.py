@@ -75,3 +75,60 @@ def setup():
     diccionario = dict()  # Crear un diccionario para almacenar los datos a enviar
 
     return datos, diccionario, client, topic  # Retornar los objetos y parámetros configurados
+
+def main():
+    """
+    Función principal del programa.
+
+    Esta función ejecuta el programa principal, el cual se encarga de configurar la comunicación
+    con el dispositivo, verificar la conexión al broker MQTT, y enviar los datos leídos del dispositivo
+    al broker MQTT en un bucle continuo.
+
+    Returns:
+        None
+    """
+    # Configurar la comunicación, el cliente MQTT, y otros parámetros necesarios
+    datos, diccionario, cliente, topic = setup()
+
+    # Verificar continuamente si el cliente MQTT está conectado al broker
+    conn_check(cliente)
+
+    while (1):
+        # Leer los datos del dispositivo
+        data = datos.readline()
+        mensaje = data.decode('utf-8').replace('\r', "").replace('\n', "").strip()
+        valores = mensaje.split(',')
+
+        # Procesar los datos si se reciben correctamente
+        if (len(valores) == 6):
+            diccionario["Eje X"] = valores[0]
+            diccionario["Eje Y"] = valores[1]
+            diccionario["Eje Z"] = valores[2]
+            diccionario["Temperatura"]  = valores[3]
+            diccionario["Bateria"] = valores[4]
+            
+            # Verificar si el voltaje de la batería es bajo y actualizar el diccionario en consecuencia
+            if(float(valores[4]) < 7.5):
+                diccionario["Bateria Baja"] = "Si"
+            else:
+                diccionario["Bateria Baja"] = "No"
+
+            # Verificar si el voltaje de la batería es bajo y actualizar el diccionario en consecuencia
+            if(int(valores[5]) == 1):
+                diccionario["Deformacion"] = "Si"
+            else:
+                diccionario["Deformacion"] = "No"
+
+            # Imprimir los datos recibidos
+            print(diccionario)
+            
+            # Convertir el diccionario a formato JSON
+            output = json.dumps(diccionario)
+
+            # Imprimir la salida JSON
+            print(output)
+
+            # Publicar los datos en el topic MQTT
+            cliente.publish(topic, output)
+
+main()
