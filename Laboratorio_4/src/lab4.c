@@ -331,6 +331,7 @@ uint8_t read_reg(uint8_t command) {
     gpio_set(GPIOC, GPIO1);            // Activa el pin GPIO1 de GPIOC (termina la comunicación con el dispositivo)
     return result;                     // Devuelve el resultado leído
 }
+
 /**
  * @brief Lee el valor de un eje combinando los bytes menos significativo y más significativo.
  *
@@ -344,11 +345,18 @@ uint8_t read_reg(uint8_t command) {
  * @return El valor combinado de 16 bits del eje.
  */
 int16_t read_axis(uint8_t lsb_command, uint8_t msb_command) {
-    int16_t result;
-    result = spi_communication(lsb_command);                // Lee el byte menos significativo
-    result |= spi_communication(msb_command) << 8;          // Lee el byte más significativo y lo combina con el LSB
-    return result;                                          // Devuelve el valor combinado
+    int16_t result; // Variable para almacenar el valor del eje leído
+
+    // Leer el registro de bits menos significativos (LSB) del eje y almacenar el resultado
+    result = read_reg(lsb_command); 
+
+    // Leer el registro de bits más significativos (MSB) del eje, desplazar los bits a la izquierda 8 veces y combinarlos con el LSB
+    result |= read_reg(msb_command) << 8;
+
+    // Retornar el valor del eje leído 
+    return result; 
 }
+
 /**
  * @brief Lee los valores de los ejes X, Y, Z y la temperatura del giroscopio.
  * 
