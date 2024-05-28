@@ -1,0 +1,15 @@
+\newpage
+\section{CONCLUSIONES Y RECOMENDACIONES}
+A lo largo del desarrollo del informe se pusieron a prueba una serie de conceptos y prácticas importantes para el manejo básico del STM32F429, así como sus GPIO, interfaces de comunicación, dispositivos para mostrar información y formas de programación. A continuación algunas conclusiones y recomendaciones recolectadas a lo largo de trabajo realizado: 
+
+\begin{itemize}
+    \item La tensión de entrada al microcontrolador es cercana a los 5 V, garantizando una operación eficiente y permitiendo la correcta evaluación de la batería, confirmando la utilidad del circuito regulador de entrada. 
+
+    \item La pantalla del microcontrolador muestra correctamente la tensión de la batería, los ejes del acelerómetro, la temperatura y el estado de transmisión. La temperatura no es precisa debido a la limitación del sensor, pero el resto de los datos son fiables.
+
+    \item Los LEDs indicaron correctamente los cambios de pendiente y niveles bajos de batería, proporcionando una respuesta visual inmediata y efectiva.
+
+    \item La transmisión de datos a Thingsboard fue exitosa, y el \textit{dashboard} interactivo permite un monitoreo claro y en tiempo real de los datos del sistema, cumpliendo con los objetivos del laboratorio.
+
+    \item Se recomienda integrar un sensor de temperatura ambiental adecuado y añadir una funcionalidad de calibración automática para los sensores del microcontrolador. Esto aumentará la precisión y confiabilidad del sistema en el monitoreo y respuesta a cambios ambientales.
+\end{itemize} 

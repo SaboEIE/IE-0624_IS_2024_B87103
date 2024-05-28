@@ -1,0 +1,78 @@
+% ======================================================================
+% Inicio del preámbulo 
+% ======================================================================
+
+\documentclass[12pt,letterpaper]{article}
+\usepackage[left=2cm, top=2.5cm, bottom=2.5cm, right=2cm]{geometry}
+\usepackage[spanish]{babel}
+\selectlanguage{spanish}
+
+\usepackage[utf8]{inputenc} % Reconocimiento de tildes y otros caracteres
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage[scaled]{helvet}
+\renewcommand\familydefault{\sfdefault}
+\usepackage[justification=centering]{caption}
+\usepackage[labelfont=bf]{caption}
+\usepackage {amsmath, amssymb, multicol, cancel} % cargar librerías para fórmulas símbolos y otras cosas
+\usepackage{placeins}
+\usepackage{float} % forzar la figura en la subsección que le corresponde
+\usepackage{pdfpages}
+
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}} % Cambiar nombre a tablas
+
+\usepackage{hyperref} % permite agregar links
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    citecolor=black,
+    } % características de los links
+
+\def \imgwidth {150mm} % ancho de las figuras
+
+% ======================================================================
+% Fin del preámbulo 
+% ======================================================================
+
+\begin{document}
+
+\begin{titlepage}
+\begin{center}
+\textbf{UNIVERSIDAD DE COSTA RICA}\\ 
+\vspace{6mm}
+\textbf{ESCUELA DE INGENIERÍA ELÉCTRICA}\\
+\vspace{3cm}
+\textbf{IE0624}\\
+\textbf{Laboratorio de Microcontroladores}\\
+\vspace{3cm}
+\textbf{Laboratorio IV}\\
+\vspace{0.5cm}
+STM32: GPIO, ADC, timer, comunicaciones e Iot\\
+\vspace{3cm}
+Estudiantes:\\
+Kendall Saborio Picado - B87103\\
+Alexander Rojas Brenes - B86869\\
+\vspace{1.5cm}
+Profesor:\\
+Ing. Marco Villalta Fallas
+\vfill
+Fecha de entrega: 29/05/2024
+\end{center}
+\end{titlepage}
+
+\tableofcontents
+
+\input{01_Introduccion}
+
+\input{02_Nota_teorica}
+
+\input{03_Desarrollo_Analisis}
+
+\input{04_Conclusiones_Recomendaciones}
+
+\input{05_Referencias}
+
+\input{06_Anexos}
+
+\end{document}
