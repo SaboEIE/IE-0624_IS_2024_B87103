@@ -1,0 +1,13 @@
+\newpage
+\section{CONCLUSIONES Y RECOMENDACIONES}
+A lo largo del desarrollo del informe se pusieron a prueba una serie de conceptos y prácticas importantes para el manejo básico del Arduino Nano 33 BLE, para la construcción de un algoritmo de reconocimiento de mascarailla utilziando \textit{Machine Learning}. A continuación algunas conclusiones y recomendaciones recolectadas a lo largo de trabajo realizado: 
+
+\begin{itemize}
+    \item El modelo de identificación muestra una precisión considerable tanto en el entrenamiento como en la validación. Con una precisión del 92.3\% en el entrenamiento y del 80.77\% en la comprobación, se evidencia que el modelo es efectivo en reconocer las clases definidas (espacio vacío, persona sin mascarilla y persona con mascarilla). Esto también sugiere que el modelo está bien ajustado para su propósito y puede realizar identificaciones precisas bajo condiciones controladas.
+
+    \item La validación del modelo mediante el cambio de color en un LED RGB proporciona una respuesta visual clara y efectiva sobre la identificación de las clases. Esto no solo confirma la precisión del modelo al identificar las clases esperadas, sino que también demuestra la capacidad de integración con dispositivos físicos para notificaciones en tiempo real.
+    
+    \item A pesar de los buenos resultados obtenidos, es recomendable explorar técnicas adicionales para mejorar aún más el rendimiento del modelo, además de exploración de diferentes arquitecturas de redes neuronales, o incluso el aumento de datos para fortalecer la identificación del modelo frente a diferentes escenarios y condiciones ambientales.
+
+    \item Se recomienda implementar medidas para mitigar posibles desafíos como ruido en los datos o variaciones ambientales, para garantizar un rendimiento consistente del modelo en situaciones del mundo real.
+\end{itemize} 
